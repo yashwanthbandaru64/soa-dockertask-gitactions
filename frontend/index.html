@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Equipment Management - Crud Service Frontend</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ==================================================================== -->
+    <!-- Top Navigation Bar                                                   -->
+    <!-- ==================================================================== -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <span class="brand-icon">
+                    <i class="bi bi-activity"></i>
+                </span>
+                <span>FitTrack <span class="fw-light text-primary-emphasis">Equipment</span></span>
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation Links & Status -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link nav-switch active" href="#" data-target="records" id="navRecords">
+                            <i class="bi bi-table me-1"></i> Equipment List
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-switch" href="#" data-target="add" id="navAdd">
+                            <i class="bi bi-plus-circle me-1"></i> Add Equipment
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Backend Connection & Integration Tools -->
+                <div class="d-flex align-items-center flex-wrap gap-2 mt-2 mt-lg-0">
+                    <a id="swaggerLink" href="http://localhost:8081/swagger-ui/index.html" target="_blank" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1" title="Open Swagger UI (Backend API Docs)">
+                        <i class="bi bi-file-earmark-code-fill"></i> Swagger UI
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#integrationModal" title="Full-Stack Integration & Testing Checklist">
+                        <i class="bi bi-clipboard2-check-fill"></i> Integration Guide
+                    </button>
+                    <div id="connectionBadge" class="connection-badge bg-secondary-subtle text-secondary border border-secondary-subtle" title="Click to configure backend URL">
+                        <span id="connectionDot" class="status-dot"></span>
+                        <span id="connectionText">Checking backend...</span>
+                        <i class="bi bi-gear-fill ms-1 text-muted"></i>
+                    </div>
+                    <button class="btn btn-sm btn-outline-light d-none d-lg-inline-flex align-items-center gap-1 btn-switch-add">
+                        <i class="bi bi-plus-lg"></i> New Item
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================================================================== -->
+    <!-- Page Hero Banner                                                     -->
+    <!-- ==================================================================== -->
+    <header class="page-hero">
+        <div class="container">
+            <div class="row align-items-center gy-3">
+                <div class="col-md-8">
+                    <h1 class="h3 fw-bold mb-1">Gym Equipment Management System</h1>
+                    <p class="text-secondary mb-0">RESTful Service client communicating directly with Spring Boot CrudService (Port 8081).</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button id="refreshRecordsBtn" class="btn btn-light border shadow-sm">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container mb-5 flex-grow-1">
+
+        <!-- ================================================================ -->
+        <!-- View 1: Equipment Records & Dashboard                            -->
+        <!-- ================================================================ -->
+        <section id="view-records">
+            <!-- Stat Summary Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card stat-card-total">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary small fw-medium">Total Items</span>
+                            <div class="stat-icon-wrapper">
+                                <i class="bi bi-grid-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value text-indigo" id="statTotal">0</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card stat-card-working">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary small fw-medium">Operational</span>
+                            <div class="stat-icon-wrapper">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value text-emerald" id="statWorking">0</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card stat-card-repair">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary small fw-medium">Maintenance</span>
+                            <div class="stat-icon-wrapper">
+                                <i class="bi bi-wrench-adjustable-circle-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value text-danger" id="statRepair">0</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card stat-card-cost">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary small fw-medium">Total Value</span>
+                            <div class="stat-icon-wrapper">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value text-amber" id="statCost">$0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="card card-custom">
+                <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div>
+                        <h2 class="h5 mb-0 fw-bold">Equipment Inventory</h2>
+                        <small class="text-secondary">Records fetched from <code>GET /gym/Displayall</code></small>
+                    </div>
+
+                    <!-- Filter & Search Controls -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="input-group input-group-sm" style="max-width: 260px;">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search name or brand...">
+                        </div>
+                        <select id="statusFilter" class="form-select form-select-sm" style="max-width: 170px;">
+                            <option value="all">All Conditions</option>
+                            <option value="working">Operational Only</option>
+                            <option value="broken">In Maintenance</option>
+                        </select>
+                        <button class="btn btn-sm btn-primary-gradient btn-switch-add">
+                            <i class="bi bi-plus-lg me-1"></i> Add Record
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <!-- Loading State -->
+                    <div id="recordsLoading" class="state-container">
+                        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h3 class="h6 text-secondary mb-1">Retrieving Gym Equipment...</h3>
+                        <p class="text-muted small">Fetching records from backend service</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="recordsError" class="state-container d-none">
+                        <div class="state-icon text-danger">
+                            <i class="bi bi-cloud-slash-fill"></i>
+                        </div>
+                        <h3 class="h5 text-danger fw-semibold">Failed to Retrieve Records</h3>
+                        <p id="recordsErrorMessage" class="text-secondary mx-auto" style="max-width: 480px;">
+                            Could not communicate with the backend service. Ensure that the CrudService application is running on port 8081.
+                        </p>
+                        <button id="retryLoadBtn" class="btn btn-outline-danger btn-sm mt-2">
+                            <i class="bi bi-arrow-repeat me-1"></i> Retry Connection
+                        </button>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="recordsEmpty" class="state-container d-none">
+                        <div class="state-icon">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h3 class="h5 fw-semibold text-dark">No Equipment Found</h3>
+                        <p class="text-secondary mx-auto mb-3" style="max-width: 420px;">
+                            There are currently no gym equipment records matching your criteria or stored in the database.
+                        </p>
+                        <button class="btn btn-primary-gradient btn-sm btn-switch-add">
+                            <i class="bi bi-plus-circle me-1"></i> Add First Equipment
+                        </button>
+                    </div>
+
+                    <!-- Records Table -->
+                    <div id="recordsTableContainer" class="table-responsive d-none">
+                        <table class="table table-custom align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 100px;">ID</th>
+                                    <th scope="col">Equipment Name</th>
+                                    <th scope="col">Brand</th>
+                                    <th scope="col">Purchase Cost</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col" class="text-end" style="width: 120px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recordsTableBody">
+                                <!-- Populated dynamically by app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================ -->
+        <!-- View 2: Add Equipment Form                                       -->
+        <!-- (CRITICAL: Contains NO ID input field; ID is auto-generated)     -->
+        <!-- ================================================================ -->
+        <section id="view-add" class="d-none">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card card-custom">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="h5 mb-0 fw-bold">Register New Gym Equipment</h2>
+                                <small class="text-secondary">Submits payload to <code>POST /gym/Add</code></small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary nav-switch" data-target="records">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Inventory
+                            </button>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <!-- Informational alert indicating auto-generated ID -->
+                            <div class="info-notice">
+                                <i class="bi bi-info-circle-fill fs-5"></i>
+                                <div>
+                                    <strong>Database Auto-Generation:</strong>
+                                    Equipment ID is assigned automatically by the PostgreSQL database sequence upon creation.
+                                </div>
+                            </div>
+
+                            <!-- Integration Testing Quick Presets -->
+                            <div class="d-flex flex-wrap align-items-center justify-content-between p-2 mb-3 bg-light rounded border">
+                                <span class="small fw-semibold text-secondary ms-1">
+                                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Testing Quick-Presets:
+                                </span>
+                                <div class="d-flex gap-1 flex-wrap mt-1 mt-md-0">
+                                    <button type="button" class="btn btn-sm btn-outline-success" id="presetValidBtn" title="Fill valid record for testing addition">
+                                        <i class="bi bi-check2-circle me-1"></i> Fill Valid Sample
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="presetInvalidCostBtn" title="Fill invalid negative cost to test validation">
+                                        <i class="bi bi-exclamation-octagon me-1"></i> Invalid Cost Test
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="presetBlankBtn" title="Clear fields to test required blank validation">
+                                        <i class="bi bi-slash-circle me-1"></i> Test Blank Input
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Add Record Form (No ID field as strictly required) -->
+                            <form id="addEquipmentForm" novalidate>
+                                <div class="row g-3">
+                                    <!-- Equipment Name -->
+                                    <div class="col-md-6">
+                                        <label for="addEquipmentName" class="form-label">
+                                            Equipment Name <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted">
+                                                <i class="bi bi-tag-fill"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="addEquipmentName" 
+                                                   placeholder="e.g. Treadmill, Barbell Set, Elliptical" 
+                                                   minlength="2" maxlength="60" required>
+                                        </div>
+                                        <div class="invalid-feedback" id="addEquipmentNameError">
+                                            Please provide a valid equipment name (at least 2 characters).
+                                        </div>
+                                        <div class="form-text">Name or title of the gym equipment.</div>
+                                    </div>
+
+                                    <!-- Brand -->
+                                    <div class="col-md-6">
+                                        <label for="addBrand" class="form-label">
+                                            Brand / Manufacturer <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted">
+                                                <i class="bi bi-building"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="addBrand" 
+                                                   placeholder="e.g. LifeFitness, Rogue, Precor" 
+                                                   minlength="2" maxlength="50" required>
+                                        </div>
+                                        <div class="invalid-feedback" id="addBrandError">
+                                            Brand name is required (min 2 characters).
+                                        </div>
+                                        <div class="form-text">Manufacturer or equipment vendor.</div>
+                                    </div>
+
+                                    <!-- Purchase Cost -->
+                                    <div class="col-md-6">
+                                        <label for="addPurchaseCost" class="form-label">
+                                            Purchase Cost ($) <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted">$</span>
+                                            <input type="number" class="form-control" id="addPurchaseCost" 
+                                                   placeholder="0.00" step="0.01" min="0.01" max="10000000" required>
+                                        </div>
+                                        <div class="invalid-feedback" id="addPurchaseCostError">
+                                            Purchase cost must be a positive number greater than 0.
+                                        </div>
+                                        <div class="form-text">Acquisition cost (must be strictly positive).</div>
+                                    </div>
+
+                                    <!-- Working Condition -->
+                                    <div class="col-md-6">
+                                        <label for="addWorking" class="form-label">
+                                            Operational Status <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted">
+                                                <i class="bi bi-shield-check"></i>
+                                            </span>
+                                            <select class="form-select" id="addWorking" required>
+                                                <option value="" selected disabled>Select operating status...</option>
+                                                <option value="true">Operational (Working)</option>
+                                                <option value="false">Needs Repair / In Maintenance</option>
+                                            </select>
+                                        </div>
+                                        <div class="invalid-feedback" id="addWorkingError">
+                                            Please select the current working condition status.
+                                        </div>
+                                        <div class="form-text">Whether the machine is ready for gym members.</div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4 text-muted">
+
+                                <!-- Form Actions -->
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="reset" class="btn btn-outline-secondary px-3" id="addResetBtn">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                                    </button>
+                                    <button type="submit" class="btn btn-primary-gradient px-4" id="addSubmitBtn">
+                                        <i class="bi bi-check-lg me-1"></i> Add Equipment
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================================================================== -->
+    <!-- Delete Confirmation Modal                                            -->
+    <!-- ==================================================================== -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title d-flex align-items-center gap-2" id="deleteModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-2">Are you sure you want to permanently delete this equipment record?</p>
+                    <div class="alert alert-light border my-3">
+                        <div class="small text-secondary">Record ID: <span id="deleteItemId" class="fw-bold text-dark"></span></div>
+                        <div class="fw-semibold fs-6 text-dark mt-1" id="deleteItemName"></div>
+                    </div>
+                    <small class="text-danger">
+                        <i class="bi bi-info-circle me-1"></i> This calls <code>DELETE /gym/Delete/{id}</code>. This action cannot be reversed.
+                    </small>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="deleteConfirmBtn">
+                        <i class="bi bi-trash3-fill me-1"></i> Delete Record
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- Edit Equipment Modal                                                 -->
+    <!-- ==================================================================== -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold" id="editModalLabel">
+                        <i class="bi bi-pencil-square text-primary me-2"></i>Edit Equipment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editEquipmentForm" novalidate>
+                    <div class="modal-body p-4">
+                        <!-- Read-only ID Field -->
+                        <div class="mb-3">
+                            <label for="editId" class="form-label text-muted small">Equipment ID (Auto-Generated)</label>
+                            <input type="text" class="form-control bg-light font-monospace" id="editId" readonly disabled>
+                        </div>
+
+                        <!-- Equipment Name -->
+                        <div class="mb-3">
+                            <label for="editEquipmentName" class="form-label">Equipment Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editEquipmentName" required minlength="2" maxlength="60">
+                            <div class="invalid-feedback" id="editEquipmentNameError">Equipment name is required (min 2 characters).</div>
+                        </div>
+
+                        <!-- Brand -->
+                        <div class="mb-3">
+                            <label for="editBrand" class="form-label">Brand <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editBrand" required minlength="2" maxlength="50">
+                            <div class="invalid-feedback" id="editBrandError">Brand name is required.</div>
+                        </div>
+
+                        <!-- Purchase Cost -->
+                        <div class="mb-3">
+                            <label for="editPurchaseCost" class="form-label">Purchase Cost ($) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="editPurchaseCost" step="0.01" min="0.01" required>
+                            <div class="invalid-feedback" id="editPurchaseCostError">Purchase cost must be greater than zero.</div>
+                        </div>
+
+                        <!-- Working Condition -->
+                        <div class="mb-3">
+                            <label for="editWorking" class="form-label">Operational Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editWorking" required>
+                                <option value="true">Operational (Working)</option>
+                                <option value="false">Needs Repair / In Maintenance</option>
+                            </select>
+                            <div class="invalid-feedback" id="editWorkingError">Please select operating status.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary-gradient" id="editSubmitBtn">
+                            <i class="bi bi-save me-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- Backend Settings Modal                                               -->
+    <!-- ==================================================================== -->
+    <div class="modal fade" id="backendSettingsModal" tabindex="-1" aria-labelledby="backendSettingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="backendSettingsModalLabel">
+                        <i class="bi bi-sliders2 text-primary me-2"></i>Backend Connection Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-secondary small mb-3">
+                        By default, the frontend connects to Spring Boot CrudService on port <code>8081</code>.
+                        You can adjust the base URL below if your service is running on another port or host.
+                    </p>
+                    <div class="mb-3">
+                        <label for="backendUrlInput" class="form-label">API Base URL</label>
+                        <input type="text" class="form-control font-monospace" id="backendUrlInput" placeholder="http://localhost:8081/gym">
+                        <div class="form-text">Default endpoint is <code>http://localhost:8081/gym</code></div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="resetBackendUrlBtn">Reset Default</button>
+                    <div>
+                        <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary btn-sm" id="saveBackendUrlBtn">Apply URL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- Integration & Testing Guide Modal                                    -->
+    <!-- ==================================================================== -->
+    <div class="modal fade" id="integrationModal" tabindex="-1" aria-labelledby="integrationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="integrationModalLabel">
+                        <i class="bi bi-clipboard2-check-fill text-info"></i> Full-Stack Integration &amp; Testing Guide
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-1-circle-fill me-1"></i> Backend Connection &amp; Swagger Verification</h6>
+                    <p class="small text-secondary mb-3">
+                        Before testing, ensure your Spring Boot <code>CrudService</code> application is running on port <code>8081</code>.
+                        You can open Swagger UI directly at:
+                        <a href="http://localhost:8081/swagger-ui/index.html" target="_blank" class="badge text-bg-warning text-decoration-none ms-1">
+                            http://localhost:8081/swagger-ui/index.html <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                    </p>
+
+                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-2-circle-fill me-1"></i> End-to-End User Flow Testing</h6>
+                    <ol class="small text-secondary ps-3 mb-3">
+                        <li class="mb-1"><strong>Add Record:</strong> Go to <em>Add Equipment</em>. Notice that <strong>no ID field</strong> exists. Click <em>"Fill Valid Sample"</em> and submit. You will see a success toast showing the auto-generated database ID.</li>
+                        <li class="mb-1"><strong>View/Display:</strong> Automatically redirects to <em>Equipment List</em> where your new item is displayed with formatted currency and operational badge.</li>
+                        <li class="mb-1"><strong>Delete Record:</strong> Click the red trash icon on any row. Confirm the action in the delete modal. The item is deleted via <code>DELETE /gym/Delete/{id}</code> and removed from the list.</li>
+                        <li class="mb-1"><strong>Edit Record:</strong> Click the blue pencil icon on any item to update details via <code>PUT /gym/Update/{id}</code>.</li>
+                    </ol>
+
+                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-3-circle-fill me-1"></i> Input Validation Testing</h6>
+                    <ul class="small text-secondary ps-3 mb-3">
+                        <li><strong>Blank Required Inputs:</strong> Click <em>"Test Blank Input"</em> and submit &rarr; clear red inline validation error messages appear for all required fields.</li>
+                        <li><strong>Invalid Ranges:</strong> Click <em>"Invalid Cost Test"</em> (negative cost: <code>-$50.00</code>) &rarr; triggers <em>"Purchase cost must be greater than zero"</em>.</li>
+                    </ul>
+
+                    <div class="alert alert-info py-2 px-3 small mb-0">
+                        <i class="bi bi-info-circle-fill me-1"></i> <strong>Note:</strong> All changes are saved directly in your PostgreSQL database (<code>exam_2400030107</code>).
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close Guide</button>
+                    <a href="http://localhost:8081/swagger-ui/index.html" target="_blank" class="btn btn-warning btn-sm">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Open Swagger UI
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- Notification Toast                                                   -->
+    <!-- ==================================================================== -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="appToast" class="toast toast-custom align-items-center border-0 text-white" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header border-0 bg-transparent text-white">
+                <i id="toastIcon" class="bi bi-info-circle-fill me-2"></i>
+                <strong id="toastTitle" class="me-auto">Notification</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body pt-0 pb-3" id="toastBody">
+                Action completed.
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- Footer                                                               -->
+    <!-- ==================================================================== -->
+    <footer class="text-center">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-md-start mb-2 mb-md-0">
+                    <strong>SOA Lab Exam</strong> &bull; Gym Equipment CrudService Frontend
+                </div>
+                <div class="col-md-6 text-md-end text-muted small">
+                    Built with Bootstrap 5 &bull; Desktop &amp; Mobile Responsive
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS (Includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- Application Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

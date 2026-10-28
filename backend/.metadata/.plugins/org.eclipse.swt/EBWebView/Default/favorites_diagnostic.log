@@ -1,0 +1,19 @@
+2026-10-27 18:28:18.039: [INFO] CurrentProfilePath: F:\DOCKERTASK\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-10-27 18:28:18.039: [INFO] Profiles total count: 1
+2026-10-27 18:28:18.039: [INFO] Profile: name=Profile 1 path=F:\DOCKERTASK\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=null
+2026-10-27 18:28:18.039: [INFO] LastUsedProfileDir: F:\DOCKERTASK\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-10-27 18:28:18.039: [INFO] OnDoneLoading sync enabled: 0
+2026-10-27 18:28:18.039: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-10-27 18:28:18.039: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-10-27 18:28:18.039: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-10-27 18:28:31.471: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-10-27 18:28:31.851: [INFO] CurrentProfilePath: F:\DOCKERTASK\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-10-27 18:28:31.851: [INFO] Profiles total count: 1
+2026-10-27 18:28:31.851: [INFO] Profile: name=Profile 1 path=F:\DOCKERTASK\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-10-27T18:28:19.784Z
+2026-10-27 18:28:31.851: [INFO] LastUsedProfileDir: F:\DOCKERTASK\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default
+2026-10-27 18:28:31.851: [INFO] MostRecentlyActiveProfile: name=Profile 1 path=F:\DOCKERTASK\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default lastActive=2026-10-27T18:28:19.784Z
+2026-10-27 18:28:31.851: [INFO] OnDoneLoading sync enabled: 0
+2026-10-27 18:28:31.851: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-10-27 18:28:31.851: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-10-27 18:28:31.851: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-10-27 18:30:42.847: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
