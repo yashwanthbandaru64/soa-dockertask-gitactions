@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: exam_240003007
+      POSTGRES_DB: exam_2400030107
     ports:
       - "5432:5432"
     volumes:
@@ -14,7 +14,7 @@ services:
       - springboot-postgres-net
 
   backend:
-    image: yashwanthbandaru64/docker-backend-240003007:latest
+    image: yashwanthbandaru64/docker-backend-2400030107:latest
     build:
       context: ./backend/CrudService
       dockerfile: Dockerfile
@@ -28,7 +28,7 @@ services:
       - springboot-postgres-net
 
   frontend:
-    image: yashwanthbandaru64/docker-frontend-240003007:latest
+    image: yashwanthbandaru64/docker-frontend-2400030107:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
